@@ -257,18 +257,13 @@ library(dplyr)
 so.markers <- FindAllMarkers(object = so, only.pos = TRUE, min.pct = 0.1)
 # Top 10 most upregulated genes per cluster
 top10 <- so.markers %>% group_by(cluster) %>% top_n(10, avg_logFC)
-```
-
-```{r}
 DoHeatmap(object = so, features = top10$gene)
 ```
 
 
 ```{r}
+## If your first cluster is something you're not interested in, then do the following code ##
 so2 <- WhichCells(object = so, idents = c(0), invert = TRUE)
-```
-
-```{r}
 pdf("Top10Genes.pdf", width = 16, height = 12)
 DoHeatmap(object = so[, so2], features = top10$gene[-seq(1, 10)])
 dev.off()
