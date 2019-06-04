@@ -146,10 +146,9 @@ DimHeatmap(so, dims = 1:18, cells = 500, balanced = TRUE)
 
 ```{r}
 # Doing a jack straw analysis to randomly permute the data with resampling in order to generate a null distribution. 
-# This takes a long time so we're commenting it out, but with more computing power we will do it. 
-# so <- JackStraw(so, num.replicate = 100)
-# so <- ScoreJackStraw(so, dims = 1:20)
-# JackStrawPlot(so, dims = 1:15)
+so <- JackStraw(so, num.replicate = 100)
+so <- ScoreJackStraw(so, dims = 1:20)
+JackStrawPlot(so, dims = 1:15)
 ```
 
 ```{r}
@@ -184,9 +183,6 @@ so <- FindClusters (object = so, resolution = 0.1)
 # head(Idents(so), 5)
 # Run a tSNE
 so <- RunTSNE(object = so, dims = 1:15)
-# so <- FindClusters(object = so, reduction.type = "pca", dims.use = 1:15, 
-#                      resolution = 1.0, print.output = 0, save.SNN = TRUE)
-# so <- RunTSNE(object = so, dims.use = 1:15, do.fast = TRUE)
 ```
 
 
@@ -247,6 +243,7 @@ FeaturePlot(object = so, features = markers$astrocyte, cols = c("lightgrey","red
 ######## Saving the object #####
 saveRDS(so, file = "Data/Seurat_Final.RDS")
 ```
+
 ```{r}
 # When you come back to the data, run this
 so <- readRDS("Data/Seurat_Final.RDS")
