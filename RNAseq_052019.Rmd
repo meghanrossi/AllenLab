@@ -11,9 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 # Read in cell ranger output
 read10x <- function(dir) {
   names <- c("barcodes.tsv", "features.tsv", "matrix.mtx")
-  # for (i in 1:length(names)) {
-  #   R.utils::gunzip(paste0(dir, "/", names[i], ".gz"))
-  # }
+   for (i in 1:length(names)) {
+     R.utils::gunzip(paste0(dir, "/", names[i], ".gz"))
+   }
   file.copy(paste0(dir, "/features.tsv"), paste0(dir, "/genes.tsv"))
   mat <- Seurat::Read10X(dir)
   file.remove(paste0(dir, "/genes.tsv"))
@@ -35,7 +35,7 @@ data<-read10x("Data/Source")
 ```
 Creating a seurat object which will be filled with your raw data
 This seurat object is the core of the analysis
-As a quality control measure, you need at least 3 cells and 500 genes at bare minimum
+As a quality control measure, you need at least 3 cells and each cell needs to have 500 genes at bare minimum
 ```{r}
 so <- CreateSeuratObject(counts = data, min.cells = 3, min.features = 500, 
                            project = "Isabel10xBulk")
@@ -50,15 +50,15 @@ so$percent.mito <- percent.mito
 ```{r}
 ######## BASIC QC ###########
 # If not using as an R markdown document, use PDF function to generate PDF figures as output
-# pdf(file = "QC.pdf",width = 12,height = 12,pointsize=10)
+pdf(file = "QC.pdf",width = 12,height = 12,pointsize=10)
 VlnPlot(object = so, features = c("nFeature_RNA", "nCount_RNA", "percent.mito"), ncol = 3)
 # If you use PDF function, include dev.off() so that the program knows you're done with the PDF
-# dev.off()
-# pdf(file = "QC2.pdf",width = 12,height = 12,pointsize=10)
+dev.off()
+pdf(file = "QC2.pdf",width = 12,height = 12,pointsize=10)
 # par(mfrow = c(1, 2))
 FeatureScatter(object = so, feature1 = "nCount_RNA", feature2 = "percent.mito", pt.size = 0.5)
 FeatureScatter(object = so, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", pt.size = 0.5)
-# dev.off()
+dev.off()
 ```
 
 
@@ -79,7 +79,7 @@ so <- NormalizeData(so)
 ```{r}
 ######## VAR GENE IDENTIFICATION ####
 # We care about genes that are highly variable between cells so we're focusing on those
-# pdf(file = "VarGenes.pdf", width = 12, height = 12, pointsize = 10)
+pdf(file = "VarGenes.pdf", width = 12, height = 12, pointsize = 10)
 so <- FindVariableFeatures(object = so, selection.method = "vst", nfeatures = 2000)
 
 # Identify the 10 most highly variable genes
@@ -91,7 +91,7 @@ plot2 <- LabelPoints(plot = plot1, points = top10)
 # CombinePlots(plots = list(plot1, plot2))
 plot1
 plot2
-# dev.off()
+dev.off()
 ```
 
 
@@ -112,6 +112,8 @@ saveRDS(so, "Data/Seurat_Scaled.RDS")
 ```{r}
 # When you come back to the data, run this
 so <- readRDS("Data/Seurat_Scaled.RDS")
+library(Seurat)
+library(dplyr)
 ```
 
 
@@ -130,13 +132,15 @@ VizDimLoadings(so, dims = 1:2, reduction = "pca")
 
 ```{r}
 # Plotting the PCA
+pdf(file = "PCA.pdf", width = 16, height = 12, pointsize = 36)
 DimPlot(so, reduction = "pca")
+dev.off()
 ```
 
 Now we are going to plot the PCA data in three ways to identify the true dimensionality of the dataset. Jackstraw analysis is going to be very time-consuming, but definitely use the other two at least to be able to see what your data/PCA is looking like
 ```{r}
 # Now we do a heat map of the first 5 PCs to take a peek at the most highly variable features
-DimHeatmap(so, dims = 1:15, cells = 500, balanced = TRUE)
+DimHeatmap(so, dims = 1:18, cells = 500, balanced = TRUE)
 # Take a look at the genes on the right side of the graphs and see if you can spot your genes of interest, i.e. known astrocyte genes. They should be on the first few PCs, if not then there is something not so great about the data and it needs further optimization. 
 ```
 
@@ -150,7 +154,9 @@ DimHeatmap(so, dims = 1:15, cells = 500, balanced = TRUE)
 
 ```{r}
 # Making an elbow plot to see how many PCs to include. This is a heuristic, but you can often see by eye where it drops off.
+pdf(file = "ElbowPlot.pdf", width = 16, height = 12, pointsize = 96)
 ElbowPlot(so)
+dev.off()
 ```
 
 
@@ -171,13 +177,13 @@ Now we can decide how many PCs to include in our analysis! Err on the higher sid
 ```{r}
 ########## Clustering ###########
 # Change the "dims = " argument to whatever number of PCs you decide on
-so <- FindNeighbors (so, dims = 1:12)
+so <- FindNeighbors (so, dims = 1:15)
 # The resolution value decides how "granular" your analysis is when you cluster. This should change depending on how many cells you have. 
 so <- FindClusters (object = so, resolution = 0.1)
 # Check out what cluster your first few cells are in if you want
 # head(Idents(so), 5)
 # Run a tSNE
-so <- RunTSNE(object = so, dims = 1:12)
+so <- RunTSNE(object = so, dims = 1:15)
 # so <- FindClusters(object = so, reduction.type = "pca", dims.use = 1:15, 
 #                      resolution = 1.0, print.output = 0, save.SNN = TRUE)
 # so <- RunTSNE(object = so, dims.use = 1:15, do.fast = TRUE)
@@ -185,7 +191,9 @@ so <- RunTSNE(object = so, dims = 1:12)
 
 
 ```{r}
+pdf(file = "TSNEPlot.pdf", width = 16, height = 12, pointsize = 24)
 TSNEPlot(object = so)
+dev.off()
 ```
 
 
@@ -274,6 +282,25 @@ so2 <- WhichCells(object = so, idents = c(0), invert = TRUE)
 ```{r}
 pdf("Top10Genes.pdf", width = 16, height = 12)
 DoHeatmap(object = so[, so2], features = top10$gene[-seq(1, 10)])
+dev.off()
+```
+
+
+```{r}
+clust <- table(so@active.ident)
+clust
+```
+
+```{r}
+require(scales)
+
+# Create vector with levels of object@ident
+identities <- levels(so@active.ident)
+
+# Create vector of default ggplot2 colors
+my_color_palette <- hue_pal()(length(identities))
+pdf(file = "BarPlotBulk.pdf", width = 16, height = 12, pointsize = 36)
+barplot(clust, col = my_color_palette, xlab = "Cluster", ylab = "Number of cells")
 dev.off()
 ```
 
