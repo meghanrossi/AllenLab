@@ -222,9 +222,6 @@ markers$opc=c("Lhfpl3","3110035E14Rik","Dcn","Lrrtm3","Sulf1","3632451O06Rik","G
 markers$oligo=c("Mog","Cldn11","Mobp","Mbp","Plp1","Mag","Mal","Ppp1r14a","Fa2h","Gsn","Gpr62","Tnni1","Kndc1","Ndrg1","Ugt8a","Tspan2","Adamts4","1700047M11Rik","Adssl1","Tmem117","Tmeff2","Sh3gl3","Plekhh1","Kcna1","Bcas1","Cpm")
 markers$endo=c("Car4","Itm2a","Ly6a","Egfl7","Cd34","Kitl","Sgpp2","Cdc42ep3","Ebf1","Ankrd37","Arhgef15","Akap2","Myo1b","Mgp","Gcnt2","Tiam1","Plk2","Slc39a10","Smoc2","Abcg2","Grb10","Pde5a","Bok","Myl4","Rasgrp3","Vtn","Tmsb10","9430020K01Rik","Anxa3","Rassf3")
 markers$astrocyte=c("Aqp4","Bmpr1b","Plcd4","Ppp1r3c","Slc30a10","Itih3","Slc14a1","Atp13a4","Grm3","Paqr6","Fgfr3","Slc4a4","Itga7","Aldh1l1","St6galnac5","Cbs","Phkg1","Slc6a11","Slc25a34","Sorcs2","Cyp4f15","Entpd2","Grhl1","Dio2","Sox9","Slc15a2","Slc7a2","AI464131","Slc7a10","Slc39a12","Mlc1","Ppp1r3g","Ephx2","Slc1a3","2900052N01Rik","Vcam1","Adhfe1","Rorb","Daam2","Rgs20","Abcd2","Lrig1","Slc7a11","Cldn10","Elovl2","Igsf1","Slc25a18","F3","Fabp7","Emp2","Pdk4","Acsbg1","Kcne1l","Igfbp2","Gpc4","Hes5","Slc1a2","Tlcd1","Dzip1l","Gfap","Tst","Rfx4","Grin2c","Slc13a3","Fjx1","Megf10","Slc27a1","Pla2g7","Mfge8","Pax6","Rdh5","Cyp4f14","Hsd11b1","Lcat","Gpam","Agt","Olfml1","Dbx2","Hapln1","Amot","Gjb6","Mtmr11","Ccnd2","Mapk4","Acsl6","Sfxn5","Ptch1","Htra1","Rasa2","Gabrg1","Id4","Scara3","Atp1b2","Acot11","Klf15","Tpbg","Ptprz1","Fgfr1","Vegfa","Fxyd1","Lonrf3","Nhsl1")
-# so = AddMetaData (so, Matrix::colMeans(so@scale.data[rownames(so@scale.data) %in% markers$microglia, ]),col.name = "Avg. Microglia")
-# AddMetaData(object = object, metadata = vector, col.name = "name") // object$name <- vector
-# object@scale.data // GetAssayData(object = object, slot = "scale.data")
 scaledso <- GetAssayData ( object = so, slot = "scale.data")
 so$Avg.Microglia <- (Matrix::colMeans(scaledso [rownames(so) %in% markers$microglia, ]))
 so$Avg.Neuron <- (Matrix::colMeans(scaledso [rownames(so) %in% markers$neuron, ]))
@@ -232,11 +229,6 @@ so$Avg.Astrocyte <- (Matrix::colMeans(scaledso [rownames(so) %in% markers$astroc
 so$Avg.OPC <- (Matrix::colMeans(scaledso [rownames(so) %in% markers$opc, ]))
 so$Avg.Oligo <- (Matrix::colMeans(scaledso [rownames(so) %in% markers$oligo, ]))
 so$Avg.Endo <- (Matrix::colMeans(scaledso [rownames(so) %in% markers$endo, ]))
-# so=AddMetaData(so,Matrix::colMeans(so@scale.data[rownames(so@scale.data) %in% markers$neuron, ]),col.name = "Avg. Neuron")
-# so=AddMetaData(so,Matrix::colMeans(so@scale.data[rownames(so@scale.data) %in% markers$opc, ]),col.name = "Avg. OPC")
-# so=AddMetaData(so,Matrix::colMeans(so@scale.data[rownames(so@scale.data) %in% markers$oligo, ]),col.name = "Avg. Oligo")
-# so=AddMetaData(so,Matrix::colMeans(so@scale.data[rownames(so@scale.data) %in% markers$endo, ]),col.name = "Avg. Endo")
-# so = AddMetaData(so,Matrix::colMeans(so@scale.data[rownames(so@scale.data) %in% markers$astrocyte, ]),col.name = "Avg. Astrocyte")
 ```
 
 ```{r}
